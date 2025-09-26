@@ -9,8 +9,16 @@ fn main() {
 
     let (target_name, folder_only) = parse_args(&args);
     let prefix = String::from("");
+    let children_prefix = String::from("");
 
-    let _ = print_target(target_name, &prefix, false, true, folder_only);
+    let _ = print_target(
+        target_name,
+        &prefix,
+        &children_prefix,
+        false,
+        true,
+        folder_only,
+    );
 }
 
 fn parse_args(args: &[String]) -> (&str, bool) {
@@ -30,6 +38,7 @@ fn parse_args(args: &[String]) -> (&str, bool) {
 fn print_target(
     target_path: &str,
     prefix: &str,
+    children_prefix: &str,
     is_last: bool,
     is_root: bool,
     folder_only: bool,
@@ -45,7 +54,7 @@ fn print_target(
     let printing_indicator = if is_root {
         ""
     } else {
-        if is_last { " └── " } else { "├── " }
+        if is_last { "└── " } else { "├── " }
     };
 
     print!(
@@ -67,15 +76,29 @@ fn print_target(
             let path = path?.path();
             let parsed_path = path.clone().into_os_string();
             let parsed_path = parsed_path.to_str().unwrap();
-            let appending_string = if is_last { "   " } else { "    " };
+            let appending_string = if is_last { "" } else { "│    " };
             let new_prefix = [prefix, appending_string].concat();
 
             if folder_only {
                 if path.is_dir() {
-                    let _ = print_target(parsed_path, &new_prefix, is_last, false, folder_only);
+                    let _ = print_target(
+                        parsed_path,
+                        &new_prefix,
+                        &children_prefix,
+                        is_last,
+                        false,
+                        folder_only,
+                    );
                 }
             } else {
-                let _ = print_target(parsed_path, &new_prefix, is_last, false, folder_only);
+                let _ = print_target(
+                    parsed_path,
+                    &new_prefix,
+                    &children_prefix,
+                    is_last,
+                    false,
+                    folder_only,
+                );
             }
         }
     }
