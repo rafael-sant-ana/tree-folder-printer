@@ -7,19 +7,33 @@ use std::path::Path;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let target_name = parse_args(&args);
+    let (target_name, folder_only) = parse_args(&args);
     let prefix = String::from("");
 
-    let _ = print_target(target_name, &prefix, false, true);
+    let _ = print_target(target_name, &prefix, false, true, folder_only);
 }
 
-fn parse_args(args: &[String]) -> &str {
+fn parse_args(args: &[String]) -> (&str, bool) {
     let target_name = &args[1];
 
-    return target_name;
+    let mut folder_only = false;
+
+    for arg in args {
+        if arg == "--folder-only" {
+            folder_only = true;
+        }
+    }
+
+    return (target_name, folder_only);
 }
 
-fn print_target(target_path: &str, prefix: &str, is_last: bool, is_root: bool) -> io::Result<()> {
+fn print_target(
+    target_path: &str,
+    prefix: &str,
+    is_last: bool,
+    is_root: bool,
+    folder_only: bool,
+) -> io::Result<()> {
     // Eu tinha que retornar o tipo do erro que pode vir do read_dir (operaçao sensivel)
     //dbg!(target_name);
     let target_path = Path::new(target_path);
@@ -31,7 +45,7 @@ fn print_target(target_path: &str, prefix: &str, is_last: bool, is_root: bool) -
     let printing_indicator = if is_root {
         ""
     } else {
-        if is_last { "└── " } else { "├── " }
+        if is_last { " └── " } else { "├── " }
     };
 
     print!(
@@ -50,11 +64,19 @@ fn print_target(target_path: &str, prefix: &str, is_last: bool, is_root: bool) -
 
         while let Some(path) = it.next() {
             let is_last = it.peek().is_none();
-            let path = path?.path().into_os_string();
-            let parsed_path = path.to_str().unwrap();
-            let new_prefix = [prefix, "   "].concat();
+            let path = path?.path();
+            let parsed_path = path.clone().into_os_string();
+            let parsed_path = parsed_path.to_str().unwrap();
+            let appending_string = if is_last { "   " } else { "    " };
+            let new_prefix = [prefix, appending_string].concat();
 
-            let _ = print_target(parsed_path, &new_prefix, is_last, false);
+            if folder_only {
+                if path.is_dir() {
+                    let _ = print_target(parsed_path, &new_prefix, is_last, false, folder_only);
+                }
+            } else {
+                let _ = print_target(parsed_path, &new_prefix, is_last, false, folder_only);
+            }
         }
     }
 

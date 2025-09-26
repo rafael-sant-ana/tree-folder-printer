@@ -7,14 +7,12 @@ calling
 `tree-folder-printer ./path` will print something like this
 
 ```
-/path
-├── folder 1
-│   ├── file 1
-│   ├── file 2
-│   ├── folder 2
-│   │   ├── file 3
-│   │   ├── file 4
-│   └── file 5
-├── file 6
-
+path/
+  ├── test_file1.txt
+  └── test_folder_2/
+    └── test_file2.c
 ```
+
+The root folder has an image "what-i-want-to-implement.png", which is a sort of flowchart I made to describe what I wanted to implement, as I don't know Rust Syntax well, and I wanted to first express my idea with recursion.
+
+No LLM Used (:
