@@ -76,15 +76,15 @@ fn print_target(
             let path = path?.path();
             let parsed_path = path.clone().into_os_string();
             let parsed_path = parsed_path.to_str().unwrap();
-            let appending_string = if is_last { "" } else { "│    " };
-            let new_prefix = [prefix, appending_string].concat();
+            let appending_string = if is_last { "   " } else { "│    " };
+            let new_prefix = [children_prefix, appending_string].concat();
 
             if folder_only {
                 if path.is_dir() {
                     let _ = print_target(
                         parsed_path,
+                        &prefix,
                         &new_prefix,
-                        &children_prefix,
                         is_last,
                         false,
                         folder_only,
@@ -93,8 +93,8 @@ fn print_target(
             } else {
                 let _ = print_target(
                     parsed_path,
-                    &new_prefix,
                     &children_prefix,
+                    &new_prefix,
                     is_last,
                     false,
                     folder_only,
